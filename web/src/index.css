@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/*
+| Tailwind v4 configures itself in CSS -- there is no tailwind.config.js.
+| Every token below becomes a utility automatically: `--color-violet-600`
+| gives bg-violet-600, text-violet-600, border-violet-600, ring-violet-600.
+*/
+@theme {
+  /* Brand violet, sampled from the reference design. */
+  --color-violet-50: #f2eeff;
+  --color-violet-100: #e6dfff;
+  --color-violet-200: #cdbfff;
+  --color-violet-300: #ae99ff;
+  --color-violet-400: #9070ff;
+  --color-violet-500: #7c5cfc;
+  --color-violet-600: #6b46f0;
+  --color-violet-700: #5a34dc;
+  --color-violet-800: #4826b0;
+  --color-violet-900: #2f1a70;
+
+  /* Neutrals: warm-grey with a faint lilac cast, not pure grey. */
+  --color-ink: #16151a;
+  --color-ink-soft: #45434f;
+  --color-muted: #8b8b98;
+  --color-line: #ececf3;
+  --color-surface: #f6f6fa;
+
+  /* The "Top item" badge. */
+  --color-gold-100: #fff4d1;
+  --color-gold-400: #ffc93c;
+  --color-gold-600: #b57f00;
+
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  /* Pill and card geometry, so radii stay consistent across components. */
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* The whole app floats on a violet field, as in the reference. */
+  background:
+    radial-gradient(1200px 600px at 15% -10%, var(--color-violet-400), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, var(--color-violet-700), transparent 55%),
+    linear-gradient(160deg, var(--color-violet-500), var(--color-violet-700));
+  background-attachment: fixed;
+  @apply min-h-screen font-sans text-ink antialiased;
+}
+
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-violet-600;
+}
+
+/* Hide the spin buttons on number inputs; they fight the pill styling. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Dual-thumb range slider used by the price filter. */
+.range-thumb {
+  @apply pointer-events-none absolute h-1.5 w-full appearance-none bg-transparent;
+}
+
+.range-thumb::-webkit-slider-thumb {
+  @apply pointer-events-auto size-4 cursor-grab appearance-none rounded-full border-2 border-white bg-violet-600;
+  box-shadow: 0 1px 4px rgb(22 21 26 / 0.35);
+}
+
+.range-thumb::-moz-range-thumb {
+  @apply pointer-events-auto size-4 cursor-grab appearance-none rounded-full border-2 border-white bg-violet-600;
+  box-shadow: 0 1px 4px rgb(22 21 26 / 0.35);
+}

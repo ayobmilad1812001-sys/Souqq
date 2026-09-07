@@ -1,0 +1,41 @@
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+/.zed
+/composer.phar
+
+# Local SQLite database -- contains seeded data and must never be committed.
+*.sqlite
+*.sqlite-journal
+*.sqlite3
+
+# Runtime storage: keep the directories, drop their contents.
+/storage/logs/*
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/testing/*
+/storage/app/public/*
+/bootstrap/cache/*
+!**/.gitkeep
+
+# Composer binary kept locally for convenience, not part of the source.
+composer.phar

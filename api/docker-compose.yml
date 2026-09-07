@@ -1,0 +1,111 @@
+services:
+  # ---------------------------------------------------------------------
+  # nginx: terminates HTTP and forwards PHP to php-fpm over the app network.
+  # ---------------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: libyamarket-nginx
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_started
+    networks: [libyamarket]
+
+  # ---------------------------------------------------------------------
+  # app: PHP-FPM running the Laravel application.
+  # ---------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: libyamarket-app
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [libyamarket]
+
+  # ---------------------------------------------------------------------
+  # queue-worker: identical image to `app`, different command. Sharing the
+  # image guarantees the worker always runs the exact code the web tier does.
+  # ---------------------------------------------------------------------
+  queue-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: libyamarket-queue
+    restart: unless-stopped
+    # --tries/--backoff mirror the per-job settings; --max-time recycles the
+    # process hourly so a long-lived worker cannot leak memory indefinitely.
+    command: php artisan queue:work redis --queue=default --tries=3 --backoff=10 --max-time=3600 --sleep=1
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks: [libyamarket]
+
+  mysql:
+    image: mysql:8.4
+    container_name: libyamarket-mysql
+    restart: unless-stopped
+    ports:
+      - "${DB_FORWARD_PORT:-3307}:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-libyamarket}
+      MYSQL_USER: ${DB_USERNAME:-libyamarket}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      # Nothing may start before MySQL actually accepts connections; without
+      # this the app container races the database on a cold `up`.
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [libyamarket]
+
+  redis:
+    image: redis:7-alpine
+    container_name: libyamarket-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_FORWARD_PORT:-6380}:6379"
+    # appendonly keeps queued jobs across a restart; a cache-only Redis would
+    # not need it, but this instance is also the queue broker.
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [libyamarket]
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  libyamarket:
+    driver: bridge

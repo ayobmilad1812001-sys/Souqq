@@ -1,0 +1,21 @@
+# Normalise line endings so the repo stays consistent across Windows/macOS/Linux.
+* text=auto eol=lf
+
+# Shell scripts must keep LF or they break inside the Docker container.
+*.sh text eol=lf
+docker/entrypoint.sh text eol=lf
+
+# Binary assets: never normalise.
+*.png binary
+*.jpg binary
+*.svg text
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Collapse lockfiles in diffs -- they are generated, not authored.
+composer.lock linguist-generated=true -diff
+package-lock.json linguist-generated=true -diff
+
+# Report the repo as PHP + TypeScript, not "HTML" from vendored assets.
+docs/** linguist-documentation=true
