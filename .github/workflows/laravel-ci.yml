@@ -1,3 +1,4 @@
+
 name: Laravel CI
 
 on:
@@ -44,6 +45,10 @@ jobs:
 
       - name: Copy environment file
         run: cp .env.example .env
+
+      - name: Configure database for CI
+        run: |
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
