@@ -23,6 +23,7 @@ One document per feature. Each covers **what it does**, **where the code lives**
 | 17 | [Docker Infrastructure](17-docker-infrastructure.md) | Five services, build layers, healthchecks |
 | 18 | [Frontend Blueprint](18-frontend-blueprint.md) | Build plan for a separate SPA that consumes this API |
 | 19 | [Production Gaps (عربي)](19-production-gaps-ar.md) | Audited list of what is still missing before this can go live |
+| 20 | [GitHub Actions CI](20-github-actions.md) | Line-by-line walkthrough of the CI workflow, and what it does not cover |
 
 ## Reading order
 
